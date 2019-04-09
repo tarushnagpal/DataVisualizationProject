@@ -1,5 +1,10 @@
 function sketch() {
     createCanvas(150, 150);
+    background(200);
+  
+    // Set colors
+    fill(204, 101, 192, 127);
+    stroke(127, 63, 120);
     
 }
 

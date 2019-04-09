@@ -1,0 +1,253 @@
+<html>
+    <head>        
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/0.7.3/p5.js"></script>
+        <!-- <script src="sketch.js"></script>         -->
+        
+    </head>
+    <body>
+        <h3>Data Visualization</h3>
+        <select onchange="changeSelect()" id="select" >
+            <option value="line" >Line Graph</option>
+            <option value="bar" >Bar Graph</option>
+            <option value="scatter" >Scatter Plot</option>
+        </select>
+        <div id="options" >
+        </div>
+    </body>
+
+    <script>
+            console.log("asd");
+            window.z = 50;
+            window.type = localStorage.getItem("type");
+            // localStorage.setItem("line_points",undefined);
+            local_line_points = localStorage.getItem("line_points");
+            if(local_line_points) {
+                window.line_points = JSON.parse(local_line_points).line_points;   
+            }
+            else {
+                window.line_points = [ [50,50], [30,40], [10,20]];
+            }
+
+            local_scatter_points = localStorage.getItem("scatter_points");
+            if(local_scatter_points) {
+                window.scatter_points = JSON.parse(local_scatter_points).scatter_points;
+            }
+            else {
+                window.scatter_points = [ [50,50], [10,20], [30,40], [40,40], [50,70], [10,15] ]
+            }
+
+            local_bar_points = localStorage.getItem("bar_points");
+            if(local_bar_points) {
+                window.bar_points = local_bar_points;
+            }
+            else {
+                window.bar_points = [ 10, 30, 20, 50, 40, 60 ]
+            }
+
+            console.log(window.line_points);
+            function changeSelect() {
+                var val = document.getElementById("select").value;
+                localStorage.setItem("type", val);
+                // setTimeout(function(){ 
+                    location.reload(); 
+                // }, 1000);                
+            }
+
+
+            if(window.type == "line") {
+                console.log("line");
+                function sketch() {
+                    createCanvas(300, 300);
+                    background(250);
+                    
+                    console.log(window.x);
+                }
+            
+                function draw() {
+                    line(0,70,70,70)
+                    line(0,0,0,70)
+                
+                    fill(204, 101, 192, 127);
+                    stroke(255, 63, 120);
+                    // console.log(window.line_points, "linepoints")
+                    for(var i in window.line_points) {
+                        ellipse(window.line_points[i][0], 70 -window.line_points[i][1], 1, 1)
+                        // console.log(window.line_points.length-1)
+                        if( parseInt(i) !== parseInt(window.line_points.length-1)) {
+                            i = parseInt(i);
+                            line(window.line_points[i][0], 70 - window.line_points[i][1], window.line_points[i+1][0], 70 - window.line_points[i+1][1])
+                        }
+                    }
+                    // line(window.z,window.z,30,40)
+                    // line(30,40,10,20)
+                }
+            }
+
+            else if(window.type == "scatter") {
+                console.log("scatter");
+                function sketch() {
+                    createCanvas(150, 150);
+                    background(200);
+                
+                    // Set colors
+                    fill(204, 101, 192, 127);
+                    stroke(127, 63, 120);
+                    
+                }
+
+                function draw() {
+                    line(0,70,70,70)
+                    line(0,0,0,70)
+                    
+                    for(var i in window.scatter_points) {
+                        ellipse( window.scatter_points[i][0] , 70-window.scatter_points[i][1], 1, 1)
+                    }
+                }
+            }
+            else if(window.type == "bar") {
+                console.log("bar");
+                function setup() {
+                    // Create the canvas
+                    createCanvas(150, 80);
+                    background(200);
+                
+                    // Set colors
+                    fill(204, 101, 192, 127);
+                    stroke(127, 63, 120);
+                    
+                    line(20,70,90,70)
+                    line(20,10,20,70)
+                    
+                    for(var i in window.bar_points) {
+                        i = parseInt(i);
+                        // console.log( i*10 + 20,70, 10, window.bar_points[i] * -1);
+                        rect( i*10 + 20,70, 10, window.bar_points[i]*-1 );
+                    }
+                }
+            }
+            
+            function getSelect() {
+                if(window.type == "line")
+                    document.getElementById("select").innerHTML =
+                    `
+                    <option value="line" selected >Line Graph</option>
+                    <option value="bar" >Bar Graph</option>
+                    <option value="scatter" >Scatter Plot</option>
+                    `;
+                else if(window.type == "bar")
+                    document.getElementById("select").innerHTML =
+                    `
+                    <option value="line" >Line Graph</option>
+                    <option value="bar" selected >Bar Graph</option>
+                    <option value="scatter" >Scatter Plot</option>
+                    `;
+                else
+                    document.getElementById("select").innerHTML =
+                    `
+                    <option value="line" >Line Graph</option>
+                    <option value="bar" >Bar Graph</option>
+                    <option value="scatter" selected >Scatter Plot</option>
+                    `;
+            }
+
+            getSelect();
+            
+            function lineSubmit() {
+                var to_update_line_points = []
+                // for(var i in document.getElementsByName("line")) {
+                for(var i=0;i<document.getElementsByName("line").length; i++ ) {
+                    i = parseInt(i);
+                    if(document.getElementsByName("line")[i]) {
+                        var _val = document.getElementsByName("line")[i].value;
+                        inner = []
+                        console.log(_val)
+                        if( _val ) {
+                            inner.push(document.getElementsByName("line")[i].value);
+                            inner.push(document.getElementsByName("line")[i+1].value);
+                            to_update_line_points.push(inner);
+                            i += 1;
+                        }
+                    }
+                }
+                var data = { line_points: to_update_line_points }
+                localStorage.setItem("line_points", JSON.stringify(data));
+                location.reload();
+                // console.log(to_update_line_points);
+            }
+
+            function addLinePoint() {
+                line_points.push([0,0]);
+                getOptions();
+            }
+            
+            function deleteLinePoint() {
+                line_points.pop();
+                getOptions();
+            }
+
+            function ScatterSubmit() {
+                var to_update_scatter_points = []
+                // for(var i in document.getElementsByName("line")) {
+                for(var i=0;i<document.getElementsByName("scatter").length; i++ ) {
+                    i = parseInt(i);
+                    if(document.getElementsByName("scatter")[i]) {
+                        var _val = document.getElementsByName("scatter")[i].value;
+                        inner = []
+                        console.log(_val)
+                        if( _val ) {
+                            inner.push(document.getElementsByName("scatter")[i].value);
+                            inner.push(document.getElementsByName("scatter")[i+1].value);
+                            to_update_scatter_points.push(inner);
+                            i += 1;
+                        }
+                    }
+                }
+                var data = { scatter_points: to_update_scatter_points }
+                localStorage.setItem("scatter_points", JSON.stringify(data));
+                location.reload();
+                // console.log(to_update_line_points);
+            }
+
+            function addScatterPoint() {
+                scatter_points.push([0,0]);
+                getOptions();
+            }
+            
+            function deleteScatterPoint() {
+                scatter_points.pop();
+                getOptions();
+            }
+
+            function getOptions() {
+                if(window.type == "line") {
+                    document.getElementById("options").innerHTML = ""
+                    for(var i in line_points) {
+                        document.getElementById("options").innerHTML += `
+                            <input name="line" type="text" value="` + line_points[i][0] + `"></input>
+                            <input name="line" type="text" value="` + line_points[i][1] + `"></input><br><br>
+                        `
+                    }
+                    document.getElementById("options").innerHTML += "<button onclick='deleteLinePoint()'>Delete Point</button> ";
+                    document.getElementById("options").innerHTML += "<button onclick='addLinePoint()'>Add Point</button> ";
+                    document.getElementById("options").innerHTML += "<button onclick='lineSubmit()'>Submit</button> ";
+                }                    
+                else if(window.type == "scatter") {
+                    document.getElementById("options").innerHTML = ""
+                    for(var i in scatter_points) {
+                        document.getElementById("options").innerHTML += `
+                            <input name="scatter" type="text" value="` + scatter_points[i][0] + `"></input>
+                            <input name="scatter" type="text" value="` + scatter_points[i][1] + `"></input><br><br>
+                        `
+                    }
+                    document.getElementById("options").innerHTML += "<button onclick='deleteScatterPoint()'>Delete Point</button> ";
+                    document.getElementById("options").innerHTML += "<button onclick='addScatterPoint()'>Add Point</button> ";
+                    document.getElementById("options").innerHTML += "<button onclick='ScatterSubmit()'>Submit</button> ";
+                }                    
+                else {
+
+                }
+            }
+            getOptions();
+
+        </script>
+</html>
